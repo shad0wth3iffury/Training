@@ -3,10 +3,12 @@ using UnityEngine;
 
 public class Fractal : MonoBehaviour {
 
-    public Mesh mesh;
+    public Mesh[] meshs;
     public Material material;
     public int maxDepth;
     public float childScale;
+    public float spawnProability;
+    public float maxTwist;
 
     public bool rotate = false;
     public float rotationSpeed = 10f;
@@ -15,8 +17,13 @@ public class Fractal : MonoBehaviour {
 
     private void Start()
     {
-        gameObject.AddComponent<MeshFilter>().mesh = mesh;
-        gameObject.AddComponent<MeshRenderer>().material = material;
+        transform.Rotate(Random.Range(-maxTwist, maxTwist), 0f, 0f);
+        if(materials == null)
+        {
+            InitializeMaterials();
+        }
+        gameObject.AddComponent<MeshFilter>().mesh = meshs[Random.Range(0, meshs.Length)];
+        gameObject.AddComponent<MeshRenderer>().material = materials[depth, Random.Range(0, 2)];
         if (rotate)
         {
             gameObject.AddComponent<Rotator>().RotationSpeed = rotationSpeed;
@@ -28,40 +35,82 @@ public class Fractal : MonoBehaviour {
         }
     }
 
-   
-    public void Initialize(Fractal parent, Vector3 direction, Quaternion orientation)
+    private Material[,] materials;
+
+    private void InitializeMaterials()
     {
+        materials = new Material[maxDepth + 1, 2];
+        for (int i = 0; i <= maxDepth; i++)
+        {
+            float t = i / (maxDepth);
+            //t *= t;
+            materials[i, 0] = new Material(material);
+            materials[i, 0].color =
+                Color.Lerp(Color.black, Color.grey, t);
+            materials[i, 1] = new Material(material);
+            materials[i, 1].color = Color.Lerp(Color.white, Color.grey, t);
+        }
+        /*
+        materials[maxDepth, 0].color = Color.cyan;
+        materials[maxDepth, 1].color = Color.red;
+        */
+    }
+   
+    public void Initialize(Fractal parent, int childIndex)
+    {
+        maxTwist = parent.maxTwist;
+        spawnProability = parent.spawnProability;
         rotate = parent.rotate;
         rotationSpeed = parent.rotationSpeed;
-        mesh = parent.mesh;
-        material = parent.material;
+        meshs = parent.meshs;
+        materials = parent.materials;
         maxDepth = parent.maxDepth;
         depth = parent.depth + 1;
         childScale = parent.childScale;
         transform.parent = parent.transform;
         transform.localScale = Vector3.one * childScale;
-        transform.localPosition = direction * (0.5f + 0.5f * childScale);
-        transform.localRotation = orientation;
+        transform.localPosition = childDirection[childIndex] * (0.5f + 0.5f * childScale);
+        transform.localRotation = childOrientations[childIndex];
     }
+
+    private static Vector3[] childDirection =
+    {
+        Vector3.up,
+        Vector3.right,
+        Vector3.left,
+        Vector3.forward,
+        Vector3.back,
+        Vector3.down
+    };
+
+    private static Quaternion[] childOrientations =
+    {
+        Quaternion.identity,
+        Quaternion.Euler(0f, 0f, -90f),
+        Quaternion.Euler(0f, 0f, 90f),
+        Quaternion.Euler(90f, 0f, 0f),
+        Quaternion.Euler(-90f, 0f, 0f),
+        Quaternion.Euler(0f, 0f, 180f)
+    };
 
     private void CreateChildren()
     {
-        new GameObject("Fractal Child").
-                AddComponent<Fractal>().Initialize(this, Vector3.up, Quaternion.identity);
-        new GameObject("Fractal Child").
-                AddComponent<Fractal>().Initialize(this, Vector3.right, Quaternion.Euler(0f, 0f, -90f));
-        new GameObject("Fractal Child").
-                AddComponent<Fractal>().Initialize(this, Vector3.left, Quaternion.Euler(0f, 0f, 90f));
-        new GameObject("Fractal Child").
-                AddComponent<Fractal>().Initialize(this, Vector3.forward, Quaternion.Euler(90f, 0f, 0f));
-        new GameObject("Fractal Child").
-                AddComponent<Fractal>().Initialize(this, Vector3.back, Quaternion.Euler(-90f, 0f, 0f));
-        if(depth == 0)
+        for(int i = 0; i < childDirection.Length; i++)
         {
-            new GameObject("Fractal Child").
-                AddComponent<Fractal>().Initialize(this, Vector3.down, Quaternion.Euler(0f, 0f, 180f));
+            if (Random.value > spawnProability)
+                continue;
+            if(i < childDirection.Length - 1)
+            {
+                new GameObject("Fractal Child").
+                AddComponent<Fractal>().Initialize(this, i);
+            }
+            else if ( depth == 0)
+            {
+                new GameObject("Fractal Child").
+                AddComponent<Fractal>().Initialize(this, i);
+            }
+            
         }
-        
     }
 
 }

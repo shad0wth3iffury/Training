@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/AtomicFrameRate.unity
+    guid: 1668dcf9aa9ac1b4881b354033c5c921
   m_configObjects: {}
