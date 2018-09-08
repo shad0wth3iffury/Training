@@ -2,25 +2,22 @@
 using System.IO;
 using UnityEngine;
 
-public class Game : MonoBehaviour {
+public class Game : PersistableObject {
 
-    public Transform prefab;
+    public PersistantStorage storage;
+
+    public PersistableObject prefab;
 
     public KeyCode createKey = KeyCode.C;
     public KeyCode newGameKey = KeyCode.N;
     public KeyCode saveGameKey = KeyCode.S;
+    public KeyCode loadGameKey = KeyCode.L;
 
-    List<Transform> objects;
-    string savePath;
+    List<PersistableObject> objects;
 
     private void Awake()
     {
-        savePath = Path.Combine(Application.persistentDataPath, "saveFile");
-    }
-
-    private void Start()
-    {
-        objects = new List<Transform>();
+        objects = new List<PersistableObject>();
     }
 
     private void Update()
@@ -35,17 +32,23 @@ public class Game : MonoBehaviour {
         }
         else if (Input.GetKeyDown(saveGameKey))
         {
-            Save();
+            storage.Save(this);
+        }
+        else if (Input.GetKeyDown(loadGameKey))
+        {
+            BeginNewGame();
+            storage.Load(this);
         }
     }
 
     void CreateObject()
     {
-        Transform t = Instantiate(prefab);
+        PersistableObject o = Instantiate(prefab);
+        Transform t = o.transform;
         t.localPosition = Random.insideUnitSphere * 5f;
         t.localRotation = Random.rotation;
         t.localScale = Vector3.one * Random.Range(0.1f, 1f);
-        objects.Add(t);
+        objects.Add(o);
     }
 
     void BeginNewGame()
@@ -57,12 +60,24 @@ public class Game : MonoBehaviour {
         objects.Clear();
     }
 
-    void Save()
+    public override void Save (GameDataWriter writer)
     {
-        using (var writer = new BinaryWriter(File.Open(savePath, FileMode.Create)))
+        writer.Write(objects.Count);
+        for(int i = 0; i < objects.Count; i++)
         {
-            Debug.Log(savePath);
-            writer.Write(objects.Count);
+            objects[i].Save(writer);
         }
     }
+
+    public override void Load (GameDataReader reader)
+    {
+        int count = reader.ReadInt();
+        for(int i = 0; i < count; i++)
+        {
+            PersistableObject o = Instantiate(prefab);
+            o.Load(reader);
+            objects.Add(o);
+        }
+    }
+
 }

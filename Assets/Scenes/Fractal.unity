@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.45126408, g: 0.5009567, b: 0.5734128, a: 1}
+  m_IndirectSpecularColor: {r: 0.45126456, g: 0.5009573, b: 0.57341367, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -142,10 +142,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meshs:
   - {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
-  material: {fileID: 2100000, guid: be208bf19b42b504fb51d4d30ad2ed82, type: 2}
+  material: {fileID: 2100000, guid: 56b2c83c528391e4091cfb7f81365888, type: 2}
   maxDepth: 5
   childScale: 0.5
-  spawnProability: 0.7
+  spawnProability: 1
   maxTwist: 90
   rotate: 1
   rotationSpeed: 10
