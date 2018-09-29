@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Fractal : MonoBehaviour {
 
+    public GameObject ParticleContainer;
     public Mesh[] meshs;
     public Material material;
     public int maxDepth;
@@ -11,6 +12,7 @@ public class Fractal : MonoBehaviour {
     public float maxTwist;
 
     public bool rotate = false;
+    public bool particleSpawn = false;
     public float rotationSpeed = 10f;
 
     private int depth;
@@ -24,6 +26,7 @@ public class Fractal : MonoBehaviour {
         }
         gameObject.AddComponent<MeshFilter>().mesh = meshs[Random.Range(0, meshs.Length)];
         gameObject.AddComponent<MeshRenderer>().material = materials[depth, Random.Range(0, 2)];
+        
         if (rotate)
         {
             gameObject.AddComponent<Rotator>().RotationSpeed = rotationSpeed;
@@ -32,6 +35,10 @@ public class Fractal : MonoBehaviour {
         if (depth < maxDepth)
         {
             CreateChildren();
+        }
+        else if (particleSpawn)
+        {
+            GameObject pC = Instantiate(ParticleContainer, this.transform);
         }
     }
 
@@ -71,6 +78,8 @@ public class Fractal : MonoBehaviour {
         transform.localScale = Vector3.one * childScale;
         transform.localPosition = childDirection[childIndex] * (0.5f + 0.5f * childScale);
         transform.localRotation = childOrientations[childIndex];
+        ParticleContainer = parent.ParticleContainer;
+        particleSpawn = parent.particleSpawn;
     }
 
     private static Vector3[] childDirection =
