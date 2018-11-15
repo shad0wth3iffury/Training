@@ -25,7 +25,7 @@ public class EffectPulse : MonoBehaviour {
     {
         float pi = Mathf.PI;
         float y;
-        y = Mathf.Sin(pi * (x + t * 0.5f));
+        y = Mathf.Sin(pi * (x + t * 0.4f)) - 0.1f;
         return y;
     }
 }

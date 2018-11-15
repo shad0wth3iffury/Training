@@ -13,6 +13,7 @@ public class Fractal : MonoBehaviour {
 
     public bool rotate = false;
     public bool particleSpawn = false;
+    public float particleSpawnProbability = 50f;
     public float rotationSpeed = 10f;
 
     private int depth;
@@ -36,7 +37,7 @@ public class Fractal : MonoBehaviour {
         {
             CreateChildren();
         }
-        else if (particleSpawn)
+        else if (particleSpawn && Random.Range(0f, 100f) < particleSpawnProbability)
         {
             GameObject pC = Instantiate(ParticleContainer, this.transform);
         }
@@ -80,6 +81,7 @@ public class Fractal : MonoBehaviour {
         transform.localRotation = childOrientations[childIndex];
         ParticleContainer = parent.ParticleContainer;
         particleSpawn = parent.particleSpawn;
+        particleSpawnProbability = parent.particleSpawnProbability;
     }
 
     private static Vector3[] childDirection =
